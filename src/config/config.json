@@ -1,0 +1,8 @@
+{
+    "db_config": {
+        "server": ".\\MSSQL2016",
+        "username": "sa",
+        "password": "Nadabueno#1",
+        "database": "ScriptWeb"
+    }
+}
