@@ -1,5 +1,4 @@
 import flet as ft
-# from src.models.sql_objects import sql_objects
 from src.core.sql_search_engine import sql_search_engine
 from src.core.sql_generator import sql_generator
 from src.utils.enumerators import object_types
@@ -8,6 +7,9 @@ from src.gui.components.config_menu import show_config_alert
 from src.gui.components.list_view_table import list_view_table
 from src.gui.components.file_explorer import btn_open_file_explorer
 from src.gui.components.file_explorer import add_path_picker
+from src.gui.components.alert_loading import loading_alert
+from src.gui.components.alert_message import alert_message
+from src.config.config import settings
 
 def main(page: ft.Page):
     page.title = "SQL Object Generator"
@@ -17,12 +19,15 @@ def main(page: ft.Page):
     _selected_rows = set()
     _selected_types = list(object_types)
     _data_checkbox = []
+    _settings = settings()
+    _alert_loading = loading_alert(page)
+    _alert_message = alert_message(page)
         
     #Funciones
     def on_change_tipo_checkboxes(e):
         selected_chboxs = [cb for cb in object_types_checkboxes if cb.value]
         if len(selected_chboxs) == 0 and not e.control.value:
-            e.control.value = True  # Mantenerlo marcado
+            e.control.value = True 
             e.control.update()
         else:
             _selected_types.clear()
@@ -30,6 +35,7 @@ def main(page: ft.Page):
         
     def validate_date(e):
         valid = validators.date_validator(e.data)
+        
         if valid == False:
             e.control.error_text = "Invalid formato. Use dd/mm/yyyy"
         elif valid == True:
@@ -38,23 +44,14 @@ def main(page: ft.Page):
             e.control.error_text = "Validation error"  
             
         e.control.update()
-    
-    def on_change_init_date(e):
-        init_date_txt_field.value = e.control.value.strftime('%d/%m/%Y')
-        init_date_txt_field.update()
         
-    def on_change_end_date(e):
-        end_date_txt_field.value = e.control.value.strftime('%d/%m/%Y')
-        end_date_txt_field.update()
+    def on_change_date(e, text_field):
+        text_field.value = e.control.value.strftime('%d/%m/%Y')
+        text_field.update()
     
     def on_change_clipboard(e):
         path_txt_field.disabled= e.control.value
         path_txt_field.update()
-    
-    def show_info_alert(content):
-        result_modal.content = content
-        page.open(result_modal)
-        result_modal.update()
     
     #Funciones del datatable
     def on_select_all(e):
@@ -92,10 +89,9 @@ def main(page: ft.Page):
         selected_items_txt_field.update()
         generate_button.update()
 
-
     def on_click_generate(e):   
         
-        page.open(loading_modal)
+        _alert_loading.show()
         
         if path_txt_field.value == "" and not clipboard_switch.value :
            path_txt_field.error_text ="This field is requiered."
@@ -104,7 +100,7 @@ def main(page: ft.Page):
         else:
             path_txt_field.error_text =None
             path_txt_field.update()
-       
+            
         definition = sql_generator(path_txt_field.value, clipboard_switch.value)
         result, message, scripts = definition.download(list_sql_objects=_selected_rows)
         
@@ -118,12 +114,14 @@ def main(page: ft.Page):
             else:
                 content = btn_open_file_explorer(message, path_txt_field.value)
             
-        show_info_alert(content)
-        page.close(loading_modal)
+        _alert_message.show(content)
+        
+        _alert_loading.hide()
         
     def on_click_search(e):
         try:
-            page.open(loading_modal)
+            
+            _alert_loading.show()
 
             object_type = ";".join([tipo.name for tipo in _selected_types])
 
@@ -143,50 +141,23 @@ def main(page: ft.Page):
             selected_items_txt_field.value = None
 
             _selected_rows.clear()
-            page.close(loading_modal)
+            
             totals_txt_field.update()
             selected_items_txt_field.update()
 
         except Exception as ex:
-            page.close(loading_modal)
-            show_info_alert(ft.Text(ex))
+            _alert_message.show(ex)
+        finally:
+            _alert_loading.hide()
+    
+    def on_close_config():
+        server_txt.value = _settings.get_server_name()
+        db_txt.value = _settings.get_db_name()
+        server_txt.update()
+        db_txt.update()
     
     #Controls
     #----------------------------------------------------------------------------------------
-    result_modal = ft.AlertDialog(
-        modal=True,
-        title=ft.Text("Information"),
-        actions=[
-            ft.TextButton("Ok", on_click=lambda e: page.close(result_modal))
-        ],
-        actions_alignment=ft.MainAxisAlignment.END
-    )
-    
-    loading_modal = ft.AlertDialog(
-        modal=True,
-        content=ft.Stack(
-            [
-                ft.Container(
-                    expand=True,
-                    width= page.window.width,
-                    height= page.window.height
-                ),
-                ft.Container(
-                    content=ft.Column(
-                        [
-                            ft.Text("Loading...", size=20, color=ft.colors.WHITE, weight=ft.FontWeight.BOLD),
-                            ft.ProgressRing(color=ft.colors.WHITE, width=50, height=50),
-                        ],
-                        alignment=ft.MainAxisAlignment.CENTER,
-                        horizontal_alignment=ft.CrossAxisAlignment.CENTER
-                    ),
-                    alignment=ft.alignment.center,
-                )
-            ]
-        ),
-        bgcolor="transparent"
-    )
-    
     container_title = ft.Container(
         margin= ft.margin.only(bottom=5, top=5),
         content= ft.ResponsiveRow(        
@@ -231,7 +202,9 @@ def main(page: ft.Page):
         on_change= validate_date,
         suffix_icon=ft.IconButton(
             icon=ft.icons.CALENDAR_MONTH, 
-            on_click=lambda e:page.open(ft.DatePicker(on_change= on_change_init_date)))
+            on_click=lambda e:page.open(ft.DatePicker(
+                on_change= lambda e: on_change_date(e,init_date_txt_field)
+                )))
     )
     
     end_date_txt_field = ft.TextField(
@@ -241,11 +214,13 @@ def main(page: ft.Page):
         on_change= validate_date,
         suffix_icon= ft.IconButton(
             icon=ft.icons.CALENDAR_MONTH, 
-            on_click=lambda e:page.open(ft.DatePicker(on_change= on_change_end_date)))
+            on_click=lambda e:page.open(ft.DatePicker(
+                on_change= lambda e: on_change_date(e,end_date_txt_field)
+                )))
     )
     
     clipboard_switch = ft.Checkbox(
-        "Save in the clipboard",
+        "Save to clipboard",
         value=True, 
         on_change=on_change_clipboard, 
         label_position=ft.LabelPosition.LEFT
@@ -259,7 +234,6 @@ def main(page: ft.Page):
         width= 150,
         height= 30,
         on_click=on_click_search
-        
     )
 
     generate_button = ft.ElevatedButton(
@@ -274,22 +248,26 @@ def main(page: ft.Page):
     settings_btn = ft.ElevatedButton(
         "Settings", 
         ft.icons.SETTINGS, 
-        on_click= lambda e: show_config_alert(page),  
+        on_click= lambda e: show_config_alert(page,on_close_config),  
         width= 150,
         height= 50
     )
     
     #Total de elementos
     totals_txt_field =  ft.Text()
-
     selected_items_txt_field =  ft.Text()
+    server_txt = ft.Text(_settings.get_server_name() )
+    db_txt = ft.Text(_settings.get_db_name() )
     
-    info_btns_container = ft.Container(
+    info_container = ft.Container(
             content= ft.Row(
                 [
                  ft.Container(ft.Row([
-                    ft.Row([ft.Text("Count: ",weight=ft.FontWeight.BOLD), totals_txt_field]), 
-                    ft.Row([ft.Text("Selected: ",weight=ft.FontWeight.BOLD),selected_items_txt_field])], 
+                    ft.Row([ft.Text("Server: ",weight=ft.FontWeight.BOLD),server_txt]),
+                    ft.Row([ft.Text("Database: ",weight=ft.FontWeight.BOLD),db_txt]),
+                    ft.Row([ft.Text("Items: ",weight=ft.FontWeight.BOLD), totals_txt_field]), 
+                    ft.Row([ft.Text("Selected: ",weight=ft.FontWeight.BOLD),selected_items_txt_field])
+                    ], 
                         spacing=100),
                     ),
                  ft.Container(ft.Row([search_btn, generate_button]))
@@ -303,13 +281,13 @@ def main(page: ft.Page):
         on_select_all= on_select_all,
         on_select_row= on_select_row,
         columns=[
-        {"caption": "ID", "width": 120,},
-        {"caption": "Schema", "width": 150},
-        {"caption": "Name", 'expand': 2},
-        {"caption": "Object Key", 'expand': 1},
-        {"caption": "SQL Object Type", 'expand': 1},
-        {"caption": "Modification date", 'expand': 1}
-    ]
+            {"caption": "ID", "width": 120,},
+            {"caption": "Schema", "width": 150},
+            {"caption": "Name", 'expand': 2},
+            {"caption": "Object Key", 'expand': 1},
+            {"caption": "SQL Object Type", 'expand': 1},
+            {"caption": "Modification date", 'expand': 1}
+        ]
     )
     
     # Layout
@@ -368,11 +346,10 @@ def main(page: ft.Page):
     
     page.floating_action_button = settings_btn
     
-    page.add(container_title,
-             controls_container,
-             info_btns_container,
-             titles_list_view,
-             table_list_view)
-    
-
-    
+    page.add(
+        container_title,
+        controls_container,
+        info_container,
+        titles_list_view,
+        table_list_view
+    )

@@ -17,7 +17,7 @@ class sql_generator:
     def download(self,list_sql_objects ): 
         try:
             
-            if(not Path(self.download_path).exists()):
+            if(not self.clipboard and not Path(self.download_path).exists()):
                 raise Exception("The route provided does not exist")
             
             #definiciones
