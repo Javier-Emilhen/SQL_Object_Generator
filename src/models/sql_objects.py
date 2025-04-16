@@ -9,12 +9,12 @@ class sql_objects(Base):
 
     # Definición de columnas
     ID = Column(Integer, primary_key=True)
-    Esquema = Column(String)
-    Nombre = Column(String)
-    ClaveObjeto = Column(String)
-    TipoObjetoSQL = Column(String)
-    FechaCreacion = Column(Date)
-    FechaModificacion = Column(Date)
+    Schema = Column(String)
+    Name = Column(String)
+    Object_Key = Column(String)
+    Sql_Object = Column(String)
+    Creation_Date = Column(Date)
+    Modification_Date = Column(Date)
     
 def __repr__(self) -> str:
-    return f"<SQL_Objects(ID={self.ID}, Esquema={self.Esquema}, Nombre={self.Nombre}, ClaveObjeto={self.ClaveObjeto}, TipoObjetoSQL={self.TipoObjetoSQL}, FechaCreacion={self.FechaCreacion},FechaModificacion={self.FechaModificacion})>"
+    return f"<SQL_Objects(ID={self.ID}, Schema={self.Schema}, Name={self.Name}, Object_Key={self.Object_Key}, Sql_Object={self.Sql_Object}, Creation_Date={self.Creation_Date},Modification_Date={self.Modification_Date})>"

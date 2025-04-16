@@ -146,7 +146,7 @@ def main(page: ft.Page):
             selected_items_txt_field.update()
 
         except Exception as ex:
-            _alert_message.show(ex)
+            _alert_message.show(str(ex))
         finally:
             _alert_loading.hide()
     

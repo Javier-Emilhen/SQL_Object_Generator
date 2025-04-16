@@ -61,11 +61,11 @@ def list_view_table(on_select_all = None, on_select_row = None, columns= None):
                     content=ft.Row([
                         checkbox,
                         ft.Text(str(obj.ID), width=120, text_align=ft.TextAlign.CENTER, selectable=True),
-                        ft.Text(str(obj.Esquema), width=150, text_align=ft.TextAlign.CENTER, selectable=True),
-                        ft.Text(str(obj.Nombre), expand=2, text_align=ft.TextAlign.START, selectable=True),
-                        ft.Text(str(obj.ClaveObjeto), expand=1, text_align=ft.TextAlign.CENTER, selectable=True),
-                        ft.Text(str(obj.TipoObjetoSQL), expand=1, text_align=ft.TextAlign.CENTER, selectable=True),
-                        ft.Text(str(obj.FechaModificacion), expand=1, text_align=ft.TextAlign.CENTER, selectable=True),
+                        ft.Text(str(obj.Schema), width=150, text_align=ft.TextAlign.CENTER, selectable=True),
+                        ft.Text(str(obj.Name), expand=2, text_align=ft.TextAlign.START, selectable=True),
+                        ft.Text(str(obj.Object_Key), expand=1, text_align=ft.TextAlign.CENTER, selectable=True),
+                        ft.Text(str(obj.Sql_Object), expand=1, text_align=ft.TextAlign.CENTER, selectable=True),
+                        ft.Text(str(obj.Modification_Date), expand=1, text_align=ft.TextAlign.CENTER, selectable=True),
                     ])
                 )
 

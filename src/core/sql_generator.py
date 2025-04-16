@@ -25,9 +25,9 @@ class sql_generator:
             _table_definitions=[]
             _function_definitions=[]
 
-            stored_procedures = [item for item in list_sql_objects if item.ClaveObjeto == objects_types.SP.value]
-            tables = [item for item in list_sql_objects if item.ClaveObjeto == objects_types.TBL.value]
-            functions = [item for item in list_sql_objects if item.ClaveObjeto == objects_types.FN.value]
+            stored_procedures = [item for item in list_sql_objects if item.Object_Key == objects_types.SP.value]
+            tables = [item for item in list_sql_objects if item.Object_Key == objects_types.TBL.value]
+            functions = [item for item in list_sql_objects if item.Object_Key == objects_types.FN.value]
 
             if (len(stored_procedures)> 0): 
                 _sp_definitions = self.get_sp_definition(stored_procedures)
@@ -60,27 +60,27 @@ class sql_generator:
     def get_sp_definition(self, stored_procedures: list[sql_objects]):
         procedures_definition = []
 
-        stored_procedures.sort(key=lambda x: x.Nombre.lower())
+        stored_procedures.sort(key=lambda x: x.Name.lower())
 
         for sp in stored_procedures:
-            result = self.db.execute(f"EXEC sp_helptext '{sp.Esquema}.{sp.Nombre}'")
+            result = self.db.execute(f"EXEC sp_helptext '{sp.Schema}.{sp.Name}'")
             script = ""
             for row in result:
                 script += row[0]
 
             script = script.replace("\r","")
-            procedures_definition.append([sp.Esquema, sp.Nombre, script, sp.TipoObjetoSQL])
+            procedures_definition.append([sp.Schema, sp.Name, script, sp.Sql_Object])
             
         return procedures_definition
         
     def get_fn_definitions(self, functions:list[sql_objects]):
         functions_definitions = []
         
-        functions.sort(key=lambda x: x.Nombre.lower())
+        functions.sort(key=lambda x: x.Name.lower())
         
         for func in functions:
             query = f"DECLARE @ID_Function INTEGER = {func.ID} "
-            with open("src\sql\Consulta_Funciones_SQL.sql", 'r',  encoding='utf-8') as sql_file:
+            with open("src\sql\SQL_Functions_Query.sql", 'r',  encoding='utf-8') as sql_file:
                 query += sql_file.read()
                 
             result = self.db.execute(query)
@@ -89,18 +89,18 @@ class sql_generator:
                 script += row[0]
             
             script = script.replace("\r","")
-            functions_definitions.append([func.Esquema, func.Nombre, script, func.TipoObjetoSQL])
+            functions_definitions.append([func.Schema, func.Name, script, func.Sql_Object])
         
         return functions_definitions
       
     def get_tbl_definition(self, tables: list[sql_objects]):
         tables_definitions = []
         
-        tables.sort(key=lambda x: x.Nombre.lower())
+        tables.sort(key=lambda x: x.Name.lower())
         
         for tbl in tables:
             query = f"DECLARE @ID_Table INTEGER = {tbl.ID} "
-            with open("src\sql\Consulta_Tabla_SQL.sql", 'r',  encoding='utf-8') as sql_file:
+            with open("src\sql\SQL_Tables_Query.sql", 'r',  encoding='utf-8') as sql_file:
                 query += sql_file.read()
             
             script = self.db.execute(query)
@@ -112,7 +112,7 @@ class sql_generator:
             
             tbl_script += "\n"
             
-            tables_definitions.append([tbl.Esquema, tbl.Nombre, tbl_script, tbl.TipoObjetoSQL, ])
+            tables_definitions.append([tbl.Schema, tbl.Name, tbl_script, tbl.Sql_Object, ])
         
         return tables_definitions
             

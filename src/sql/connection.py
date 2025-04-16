@@ -16,13 +16,9 @@ class sql_class:
     
     def load_sql_data(self):
         
-        # with open(self.config_path,'r') as config_file:
-        #     config = json.load(config_file)
-        
         config = settings(self.config_path)
         db_config = config.get_db_config()
             
-        # db_config = config.get("db_config")
         self.server = db_config["server"]
         self.username = db_config["username"]
         self.password = db_config["password"]
@@ -35,7 +31,7 @@ class sql_class:
         is_configured = config.is_configured()
         
         if(not is_configured):
-           raise Exception("SQL Connection is requiered. Go settings below")
+           raise Exception("The SQL configuration is required, go to the settings button below (Settings).")
         
         connection_string = f'mssql+pyodbc://{self.username}:{self.password}@{self.server}/{self.database}?driver=ODBC+Driver+17+for+SQL+Server'
         self.engine = create_engine(connection_string,pool_pre_ping=True)
@@ -74,4 +70,4 @@ class sql_class:
             return True, "Successful connection"
           
         except Exception as ex :
-            return False, f"Connection error: {repr(ex)}"
+            return False, f"Connection error: \n{repr(ex)}"
