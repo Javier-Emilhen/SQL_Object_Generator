@@ -1,0 +1,75 @@
+('C:\\Users\\javierrodriguez\\Desktop\\Proyectos\\Proyectos '
+ 'Personales\\SQL_Object_Generator\\build\\SQL Object Generator\\SQL Object '
+ 'Generator.pkg',
+ {'BINARY': True,
+  'DATA': True,
+  'EXECUTABLE': True,
+  'EXTENSION': True,
+  'PYMODULE': True,
+  'PYSOURCE': True,
+  'PYZ': False,
+  'SPLASH': True,
+  'SYMLINK': False},
+ [('pyi-contents-directory _internal', '', 'OPTION'),
+  ('PYZ-00.pyz',
+   'C:\\Users\\javierrodriguez\\Desktop\\Proyectos\\Proyectos '
+   'Personales\\SQL_Object_Generator\\build\\SQL Object Generator\\PYZ-00.pyz',
+   'PYZ'),
+  ('struct',
+   'C:\\Users\\javierrodriguez\\Desktop\\Proyectos\\Proyectos '
+   'Personales\\SQL_Object_Generator\\build\\SQL Object '
+   'Generator\\localpycs\\struct.pyc',
+   'PYMODULE'),
+  ('pyimod01_archive',
+   'C:\\Users\\javierrodriguez\\Desktop\\Proyectos\\Proyectos '
+   'Personales\\SQL_Object_Generator\\build\\SQL Object '
+   'Generator\\localpycs\\pyimod01_archive.pyc',
+   'PYMODULE'),
+  ('pyimod02_importers',
+   'C:\\Users\\javierrodriguez\\Desktop\\Proyectos\\Proyectos '
+   'Personales\\SQL_Object_Generator\\build\\SQL Object '
+   'Generator\\localpycs\\pyimod02_importers.pyc',
+   'PYMODULE'),
+  ('pyimod03_ctypes',
+   'C:\\Users\\javierrodriguez\\Desktop\\Proyectos\\Proyectos '
+   'Personales\\SQL_Object_Generator\\build\\SQL Object '
+   'Generator\\localpycs\\pyimod03_ctypes.pyc',
+   'PYMODULE'),
+  ('pyimod04_pywin32',
+   'C:\\Users\\javierrodriguez\\Desktop\\Proyectos\\Proyectos '
+   'Personales\\SQL_Object_Generator\\build\\SQL Object '
+   'Generator\\localpycs\\pyimod04_pywin32.pyc',
+   'PYMODULE'),
+  ('pyiboot01_bootstrap',
+   'C:\\Users\\javierrodriguez\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\PyInstaller\\loader\\pyiboot01_bootstrap.py',
+   'PYSOURCE'),
+  ('pyi_rth_inspect',
+   'C:\\Users\\javierrodriguez\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\PyInstaller\\hooks\\rthooks\\pyi_rth_inspect.py',
+   'PYSOURCE'),
+  ('pyi_rth_localhost_fletd',
+   'C:\\Users\\javierrodriguez\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\flet_cli\\__pyinstaller\\rthooks\\pyi_rth_localhost_fletd.py',
+   'PYSOURCE'),
+  ('pyi_rth_pkgutil',
+   'C:\\Users\\javierrodriguez\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\PyInstaller\\hooks\\rthooks\\pyi_rth_pkgutil.py',
+   'PYSOURCE'),
+  ('pyi_rth_multiprocessing',
+   'C:\\Users\\javierrodriguez\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\PyInstaller\\hooks\\rthooks\\pyi_rth_multiprocessing.py',
+   'PYSOURCE'),
+  ('pyi_rth_pkgres',
+   'C:\\Users\\javierrodriguez\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\PyInstaller\\hooks\\rthooks\\pyi_rth_pkgres.py',
+   'PYSOURCE'),
+  ('pyi_rth_setuptools',
+   'C:\\Users\\javierrodriguez\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\PyInstaller\\hooks\\rthooks\\pyi_rth_setuptools.py',
+   'PYSOURCE'),
+  ('main',
+   'C:\\Users\\javierrodriguez\\Desktop\\Proyectos\\Proyectos '
+   'Personales\\SQL_Object_Generator\\main.py',
+   'PYSOURCE')],
+ 'python313.dll',
+ True,
+ False,
+ False,
+ [],
+ None,
+ None,
+ None)

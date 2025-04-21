@@ -4,6 +4,7 @@ import os
 from src.models.sql_objects import sql_objects
 from src.utils.enumerators import objects_types
 from src.sql.connection import sql_class
+from src.config.config import settings
 from pathlib import Path
 
 class sql_generator:
@@ -118,7 +119,9 @@ class sql_generator:
             
     def generate_scripts(self, _sp_definitions,_function_definitions,_table_definitions):
         
-        with open('src/config/config.json','r') as config_file:
+        _settings = settings()
+        path = _settings.get_config_file_path()
+        with open(path,'r') as config_file:
             config = json.load(config_file)
         database = config.get("db_config")["database"]
 

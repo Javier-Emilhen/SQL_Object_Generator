@@ -4,9 +4,10 @@ from src.config.config import settings
 
 class sql_class:
     
-    def __init__(self, config_path='src/config/config.json'):
+    def __init__(self):
+        _settings = settings()
         self.engine = None
-        self.config_path = config_path
+        self.config_path = _settings.get_config_file_path()
         self.server = None
         self.database = None
         self.username = None
@@ -16,7 +17,7 @@ class sql_class:
     
     def load_sql_data(self):
         
-        config = settings(self.config_path)
+        config = settings()
         db_config = config.get_db_config()
             
         self.server = db_config["server"]
@@ -27,7 +28,7 @@ class sql_class:
         
     def connect(self):
         
-        config = settings(self.config_path)
+        config = settings()
         is_configured = config.is_configured()
         
         if(not is_configured):

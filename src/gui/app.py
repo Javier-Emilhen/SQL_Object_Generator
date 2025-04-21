@@ -15,6 +15,7 @@ def main(page: ft.Page):
     page.title = "SQL Object Generator"
     page.bgcolor = ft.Colors.BLUE_GREY_900
     page.window.maximized = True
+    # page.window.icon = "../assets/icono.ico"
 
     _selected_rows = set()
     _selected_types = list(object_types)

@@ -1,9 +1,11 @@
 import flet as ft
 import json
 from pathlib import Path
+from src.config.config import settings
 from src.sql.connection import sql_class
 
-CONFIG_PATH = Path("src/config/config.json")
+_settings = settings()
+CONFIG_PATH = Path(_settings.get_config_file_path())
 
 def load_data():
     with open(CONFIG_PATH, "r", encoding="utf-8") as f:

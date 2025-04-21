@@ -1,9 +1,20 @@
 import json
+from pathlib import Path
+from src.utils.utils import utils
 
 class settings:
     
-    def __init__(self, config_path='src/config/config.json'):
-        self.config_path = config_path
+    def __init__(self):
+        
+         self.config_path = utils.resource_path()
+        
+    def get_config_file_path(self):
+
+        # path= utils.resource_path()
+        
+        # print (path)
+        
+        return self.config_path
         
     def get_db_config(self):
         with open(self.config_path,'r') as config_file:
