@@ -1,1 +1,32 @@
-/dist
+# ─── ENTORNO VIRTUAL ──────────────────────
+.venv/
+venv/
+env/
+ENV/
+*.env
+
+# ─── PYTHON ───────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+*.log
+
+# ─── CONFIG DE PYINSTALLER ────────────────
+build/
+dist/
+*.spec
+
+# ─── ARCHIVOS TEMPORALES / SISTEMA ───────
+.DS_Store
+Thumbs.db
+
+# ─── ARCHIVOS DE CACHE / DEPENDENCIAS ────
+pip-wheel-metadata/
+*.db
+*.sqlite3
+
+# ─── CONFIG DE VS CODE (opcional) ────────
+.vscode/

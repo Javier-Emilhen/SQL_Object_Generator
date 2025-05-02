@@ -3,6 +3,8 @@ import uuid
 from datetime import datetime
 from src.sql.connection import sql_class
 from src.models.sql_objects import sql_objects
+from src.utils.utils import utils
+from src.utils.enumerators import sql_definitions
 
 class sql_search_engine:
 
@@ -49,7 +51,9 @@ class sql_search_engine:
         query = "".join(input_params)
 
         #Leer el archivo donde se aloja la query de consulta
-        with open("src\sql\SQL_Objects_Query.sql", 'r',  encoding='utf-8') as sql_file:
+        # path = utils.resource_path('SQL_Objects_Query.sql')
+        path = utils.resource_path(sql_definitions.SEARCH_FILE.value)
+        with open(path, 'r',  encoding='utf-8') as sql_file:
             query += sql_file.read()
         
         #Guardar la consulta que se generó  

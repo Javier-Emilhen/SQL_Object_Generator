@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 from src.config.config import settings
 from src.sql.connection import sql_class
+# from src.gui.components.alert_loading import loading_alert
 
 _settings = settings()
 CONFIG_PATH = Path(_settings.get_config_file_path())
@@ -17,6 +18,8 @@ def save_data(data):
         json.dump(data, f, indent=4)
 
 def show_config_alert(page: ft.Page, on_close=None):
+    
+    
     
     def on_change_validate(e):
         if(not e.data or e.data == ""):
@@ -33,7 +36,7 @@ def show_config_alert(page: ft.Page, on_close=None):
         control.update()
         
     def on_click_save(e):
-        
+
         result = test_connection()
         
         if not result:
@@ -53,6 +56,9 @@ def show_config_alert(page: ft.Page, on_close=None):
             
         page.close(dlg)
         page.update()
+    
+    def on_click_test(e):
+        test_connection()
     
     def test_connection():
     
@@ -120,7 +126,7 @@ def show_config_alert(page: ft.Page, on_close=None):
             ft.Row(
                 [
                  ft.Container(
-                     ft.TextButton("Test connection", on_click=lambda e: test_connection())),
+                     ft.TextButton("Test connection", on_click=on_click_test)),
                  ft.Container(ft.Row([
                         ft.TextButton("Cancel", on_click=lambda e: setattr(dlg, "open", False) or page.update()),
                         ft.ElevatedButton("Save", on_click=on_click_save)]))

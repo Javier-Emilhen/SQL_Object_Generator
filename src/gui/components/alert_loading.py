@@ -1,6 +1,5 @@
 import flet as ft
 
-
 class loading_alert:
     
     def __init__(self, page: ft.Page):
@@ -9,11 +8,7 @@ class loading_alert:
             modal=True,
             content=ft.Stack(
                 [
-                    ft.Container(
-                        expand=True,
-                        # width= page.window.width,
-                        # height= page.window.height
-                    ),
+                    ft.Container(expand=True),
                     ft.Container(
                         content=ft.Column(
                             [
@@ -32,10 +27,13 @@ class loading_alert:
 
     
     def show(self):
+        # self.page.open(self.dialog)
+        self.page.dialog = self.dialog
+        self.page.update()
         self.page.open(self.dialog)
         
     def hide(self):
+        # self.page.close(self.dialog)
+        self.page.dialog = None
+        self.page.update()
         self.page.close(self.dialog)
-    
-    
-    

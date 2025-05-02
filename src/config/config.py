@@ -5,15 +5,9 @@ from src.utils.utils import utils
 class settings:
     
     def __init__(self):
-        
-         self.config_path = utils.resource_path()
+         self.config_path = utils.resource_path('config.json')
         
     def get_config_file_path(self):
-
-        # path= utils.resource_path()
-        
-        # print (path)
-        
         return self.config_path
         
     def get_db_config(self):

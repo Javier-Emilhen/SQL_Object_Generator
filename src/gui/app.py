@@ -2,6 +2,7 @@ import flet as ft
 from src.core.sql_search_engine import sql_search_engine
 from src.core.sql_generator import sql_generator
 from src.utils.enumerators import object_types
+from src.utils.enumerators import table_get_options
 from src.utils.validators import validators
 from src.gui.components.config_menu import show_config_alert
 from src.gui.components.list_view_table import list_view_table
@@ -15,7 +16,7 @@ def main(page: ft.Page):
     page.title = "SQL Object Generator"
     page.bgcolor = ft.Colors.BLUE_GREY_900
     page.window.maximized = True
-    # page.window.icon = "../assets/icono.ico"
+    page.window.icon = '../assets/favicon.ico'
 
     _selected_rows = set()
     _selected_types = list(object_types)
@@ -33,6 +34,14 @@ def main(page: ft.Page):
         else:
             _selected_types.clear()
             _selected_types.extend([object_types(cb.label) for cb in object_types_checkboxes if cb.value])
+            
+        # table_options_dropdown.disabled = not any(
+        #     chkbox.value and chkbox.label == object_types.TBL.value
+        #     for chkbox in selected_chboxs
+        # )
+        
+        # table_options_dropdown.update()
+            
         
     def validate_date(e):
         valid = validators.date_validator(e.data)
@@ -52,6 +61,9 @@ def main(page: ft.Page):
     
     def on_change_clipboard(e):
         path_txt_field.disabled= e.control.value
+        path_txt_field.update()
+        
+        path_txt_field.error_text =None
         path_txt_field.update()
     
     #Funciones del datatable
@@ -92,8 +104,6 @@ def main(page: ft.Page):
 
     def on_click_generate(e):   
         
-        _alert_loading.show()
-        
         if path_txt_field.value == "" and not clipboard_switch.value :
            path_txt_field.error_text ="This field is requiered."
            path_txt_field.update()
@@ -102,7 +112,9 @@ def main(page: ft.Page):
             path_txt_field.error_text =None
             path_txt_field.update()
             
-        definition = sql_generator(path_txt_field.value, clipboard_switch.value)
+        _alert_loading.show()
+            
+        definition = sql_generator(path_txt_field.value, clipboard_switch.value, table_options_dropdown.value)
         result, message, scripts = definition.download(list_sql_objects=_selected_rows)
         
         if(not result):
@@ -188,8 +200,8 @@ def main(page: ft.Page):
 
     path_txt_field = ft.TextField(
         label="Download Path",
-        hint_text="Example: C:/Downloads",
-        value="C:\\Users\\javierrodriguez\\Downloads\\Test",
+        hint_text="Example: C:\Downloads",
+        # value="C:\\Users\\javierrodriguez\\Downloads\\Test",
         border=ft.border.all(1, ft.colors.GREY),
         disabled=True
     )
@@ -225,6 +237,19 @@ def main(page: ft.Page):
         value=True, 
         on_change=on_change_clipboard, 
         label_position=ft.LabelPosition.LEFT
+    )
+   
+    # records_checkbox = ft.Checkbox(
+    #     "Generate table records",
+    #     value=True, 
+    #     label_position=ft.LabelPosition.LEFT
+    # )
+    
+    table_options_dropdown = ft.Dropdown(
+        label= "Table Options",
+        options=[ft.DropdownOption(key=option.name, text=option.value) for option in table_get_options],
+        value= table_get_options.Schema_Only.name,
+        expand=False
     )
         
     object_types_checkboxes = [ft.Checkbox(label=option.value, value=True, on_change=on_change_tipo_checkboxes) for option in object_types]
@@ -305,14 +330,22 @@ def main(page: ft.Page):
                     ft.Container(
                         content=filter_txt_field,
                         padding=5,
-                        col={"sm": 10, "md": 4, "xl":6},
+                        col={"sm": 10, "md": 4, "xl":4},
                     ),
                     
                     ft.Container(
-                        content=ft.Row(object_types_checkboxes),
+                        content=ft.Row(object_types_checkboxes, alignment=ft.MainAxisAlignment.CENTER),
+                        margin=ft.margin.only(top=10),
                         padding=5,
-                        col={"sm": 12, "md": 4, "xl": 4},
-                    )      
+                        # border=ft.border.all(1, ft.colors.RED),
+                        col={"sm": 12, "md": 4, "xl": 3},
+                    ),
+                    ft.Container(
+                       content=table_options_dropdown,
+                    #    border=ft.border.all(1, ft.colors.RED),
+                       expand=True,
+                       col={"sm": 4, "md": 5, "xl": 3},
+                       ),
                 ],
                 spacing= 15
             ),
@@ -331,13 +364,18 @@ def main(page: ft.Page):
                         col={"sm": 4, "md": 4, "xl": 2},
                         ),
                     ft.Container(
-                        content=clipboard_switch, 
-                        padding=5,
-                        col={"sm": 4, "md": 4, "xl": 2},
+                        content=ft.Row(
+                            [clipboard_switch],
+                            alignment=ft.MainAxisAlignment.CENTER,
+                        ), 
+                        margin= ft.Margin(10,10,0,0),
+                        alignment=ft.alignment.top_center,
+                        col={"sm": 4, "md": 4, "xl": 2}
                         ),
+                   
                     ft.Container(
                         content=path_txt_field, 
-                        padding=5,
+                        padding=2,
                         col={"sm": 12, "md": 4, "xl": 6},
                         )
                 ]
