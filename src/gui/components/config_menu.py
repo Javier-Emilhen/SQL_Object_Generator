@@ -114,7 +114,9 @@ def show_config_alert(page: ft.Page, on_close=None):
     
     dlg = ft.AlertDialog(
         modal=True,
-        title=ft.Text("Database connection configuration"),
+        content_padding=20,
+        title_padding=ft.padding.all(20),
+        title=ft.Text("DB connection", text_align=ft.TextAlign.CENTER),
         content=ft.Column([
             text_server,
             text_user,
@@ -122,6 +124,7 @@ def show_config_alert(page: ft.Page, on_close=None):
             txt_db,
             message_container
         ], tight=True, spacing=20),
+        actions_alignment=ft.MainAxisAlignment.END,
         actions=[
             ft.Row(
                 [
@@ -133,8 +136,7 @@ def show_config_alert(page: ft.Page, on_close=None):
                 ],
                 alignment= ft.MainAxisAlignment.SPACE_BETWEEN, 
             )
-        ],
-        actions_alignment=ft.MainAxisAlignment.END
+        ]
     )
 
     page.open(dlg)

@@ -168,6 +168,21 @@ def main(page: ft.Page):
         db_txt.value = _settings.get_db_name()
         server_txt.update()
         db_txt.update()
+        db_txt.update()
+        
+        #Reiniciar controles al cambiar conexion
+        generate_button.disabled=True
+        table_list_view.controls.clear()
+        _select_all_checkbox.value = False
+        _data_checkbox.clear()
+        totals_txt_field.value= None
+        selected_items_txt_field.value=None
+        
+        totals_txt_field.update()
+        selected_items_txt_field.update()
+        generate_button.update()
+        _select_all_checkbox.update()
+        table_list_view.update()
     
     #Controls
     #----------------------------------------------------------------------------------------
@@ -258,7 +273,7 @@ def main(page: ft.Page):
         text = "Search",
         icon = ft.icons.SEARCH_OUTLINED,
         width= 150,
-        height= 30,
+        height= 40,
         on_click=on_click_search
     )
 
@@ -266,7 +281,7 @@ def main(page: ft.Page):
         text = "Generate",
         icon = ft.icons.DOWNLOAD,
         width= 150,
-        height= 30,
+        height= 40,
         disabled=True,
         on_click=on_click_generate
     )
@@ -276,7 +291,7 @@ def main(page: ft.Page):
         ft.icons.SETTINGS, 
         on_click= lambda e: show_config_alert(page,on_close_config),  
         width= 150,
-        height= 50
+        height= 40
     )
     
     #Total de elementos
@@ -307,7 +322,7 @@ def main(page: ft.Page):
         on_select_all= on_select_all,
         on_select_row= on_select_row,
         columns=[
-            {"caption": "ID", "width": 120,},
+            {"caption": "SQL ID", "width": 120,},
             {"caption": "Schema", "width": 150},
             {"caption": "Name", 'expand': 2},
             {"caption": "Object Key", 'expand': 1},

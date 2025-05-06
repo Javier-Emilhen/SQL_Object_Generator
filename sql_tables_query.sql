@@ -1,10 +1,10 @@
---DECLARE @ID_Table INTEGER =1974298093
+--DECLARE @ID_Table INTEGER =957246465
 
 DECLARE @object_name SYSNAME, @object_id INT
 DECLARE @SQL NVARCHAR(MAX) = ''
 
 SELECT 
-      @object_name = '[' + s.name + '].[' + o.name + ']',
+	  @object_name = QUOTENAME(s.name) + '.' + QUOTENAME(o.name) ,
       @object_id = o.[object_id]
 FROM sys.objects o WITH (NOWAIT)
 JOIN sys.schemas s WITH (NOWAIT) ON o.[schema_id] = s.[schema_id]
@@ -37,10 +37,10 @@ fk_columns AS
     WHERE k.parent_object_id = @object_id
 )
 SELECT @SQL = 'CREATE TABLE ' + @object_name +'(' + CHAR(10) + STUFF((
-    SELECT ' ,[' + c.name + '] ' + 
+	SELECT ' ,' + QUOTENAME(c.name) +
         CASE WHEN c.is_computed = 1
             THEN 'AS ' + cc.[definition] 
-            ELSE UPPER(tp.name) + 
+            ELSE UPPER(quotename(tp.name)) + 
                 CASE WHEN tp.name IN ('varchar', 'char', 'varbinary', 'binary', 'text')
                        THEN '(' + CASE WHEN c.max_length = -1 THEN 'MAX' ELSE CAST(c.max_length AS VARCHAR(5)) END + ')'
                      WHEN tp.name IN ('nvarchar', 'nchar', 'ntext')
@@ -64,26 +64,27 @@ SELECT @SQL = 'CREATE TABLE ' + @object_name +'(' + CHAR(10) + STUFF((
     WHERE c.[object_id] = @object_id
     ORDER BY c.column_id
     FOR XML PATH(''), TYPE).value('.', 'NVARCHAR(MAX)'), 1, 2, CHAR(9) + ' ')
-    + ISNULL((SELECT ',CONSTRAINT [' + k.name + '] PRIMARY KEY ' +
+	+ ISNULL((SELECT ',CONSTRAINT ' + QUOTENAME(k.name) + ' PRIMARY KEY' +
             CASE WHEN i.[type_desc] IS NOT NULL THEN ' ' + i.[type_desc] ELSE '' END + ' (' +
                 (SELECT STUFF((
-                     SELECT ', [' + c.name + '] ' + CASE WHEN ic.is_descending_key = 1 THEN 'DESC' ELSE 'ASC' END
+					 SELECT ', ' + quotename(c.name) + CASE WHEN ic.is_descending_key = 1 THEN ' DESC' ELSE ' ASC' END
                      FROM sys.index_columns ic WITH (NOWAIT)
                      JOIN sys.columns c WITH (NOWAIT) ON c.[object_id] = ic.[object_id] AND c.column_id = ic.column_id
                      WHERE ic.is_included_column = 0
                          AND ic.[object_id] = k.parent_object_id 
                          AND ic.index_id = k.unique_index_id     
                      FOR XML PATH(N''), TYPE).value('.', 'NVARCHAR(MAX)'), 1, 2, ''))
-        + ')' + CHAR(13) +
-        '        WITH (' +
-            'PAD_INDEX = ' + UPPER(CASE WHEN i.is_padded = 1 THEN 'ON' ELSE 'OFF' END) + ', ' +
-            'STATISTICS_NORECOMPUTE = ' + UPPER(CASE WHEN st.no_recompute = 1 THEN 'ON' ELSE 'OFF' END)+', ' +
-            'IGNORE_DUP_KEY = ' + UPPER(CASE WHEN i.ignore_dup_key = 1 THEN 'ON' ELSE 'OFF' END) + ', ' +
-            'ALLOW_ROW_LOCKS = ' + UPPER(CASE WHEN i.allow_row_locks = 1 THEN 'ON' ELSE 'OFF' END) + ', ' +
-            'ALLOW_PAGE_LOCKS = ' + UPPER(CASE WHEN i.allow_page_locks = 1 THEN 'ON' ELSE 'OFF' END) + ', ' +
-            'FILLFACTOR = ' + CAST(i.fill_factor AS VARCHAR) + ', ' +
-            'OPTIMIZE_FOR_SEQUENTIAL_KEY = ' + UPPER(CASE WHEN i.optimize_for_sequential_key = 1 THEN 'ON' ELSE 'OFF' END) +
-        ') ON [' + ds.name + ']' + CHAR(13) + ')' + 'ON [' + ds.name + ']'
+        + ')' + CHAR(13) + ')'
+		-- ----------------------- Table settings ---------------------
+        -- '        WITH (' +
+        --     'PAD_INDEX = ' + UPPER(CASE WHEN i.is_padded = 1 THEN 'ON' ELSE 'OFF' END) + ', ' +
+        --     'STATISTICS_NORECOMPUTE = ' + UPPER(CASE WHEN st.no_recompute = 1 THEN 'ON' ELSE 'OFF' END)+', ' +
+        --     'IGNORE_DUP_KEY = ' + UPPER(CASE WHEN i.ignore_dup_key = 1 THEN 'ON' ELSE 'OFF' END) + ', ' +
+        --     'ALLOW_ROW_LOCKS = ' + UPPER(CASE WHEN i.allow_row_locks = 1 THEN 'ON' ELSE 'OFF' END) + ', ' +
+        --     'ALLOW_PAGE_LOCKS = ' + UPPER(CASE WHEN i.allow_page_locks = 1 THEN 'ON' ELSE 'OFF' END) + ', ' +
+        --     'FILLFACTOR = ' + CAST(i.fill_factor AS VARCHAR) + ', ' +
+        --     'OPTIMIZE_FOR_SEQUENTIAL_KEY = ' + UPPER(CASE WHEN i.optimize_for_sequential_key = 1 THEN 'ON' ELSE 'OFF' END) +
+        -- ') ON [' + ds.name + ']' + CHAR(13) + ')' + 'ON [' + ds.name + ']'
  FROM sys.key_constraints k
 	JOIN sys.indexes i ON i.object_id = k.parent_object_id AND i.index_id = k.unique_index_id
 	JOIN sys.data_spaces ds ON ds.data_space_id = i.data_space_id
@@ -97,16 +98,16 @@ SELECT @SQL = 'CREATE TABLE ' + @object_name +'(' + CHAR(10) + STUFF((
                 THEN ' NOCHECK' 
                 ELSE ' CHECK' 
               END + 
-              ' ADD CONSTRAINT [' + fk.name  + '] FOREIGN KEY(' 
+			  ' ADD CONSTRAINT ' + quotename(fk.name) + ' FOREIGN KEY(' 
               + STUFF((
-                SELECT ', [' + k.cname + ']'
+				SELECT ', ' + quotename(k.cname)
                 FROM fk_columns k
                 WHERE k.constraint_object_id = fk.[object_id]
                 FOR XML PATH(''), TYPE).value('.', 'NVARCHAR(MAX)'), 1, 2, '')
                + ')' +
-              ' REFERENCES [' + SCHEMA_NAME(ro.[schema_id]) + '].[' + ro.name + '] ('
+			  ' REFERENCES ' + quotename(SCHEMA_NAME(ro.[schema_id])) + '.' + quotename(ro.name) + ' ('
               + STUFF((
-                SELECT ', [' + k.rcname + ']'
+                SELECT ', ' + quotename(k.rcname)
                 FROM fk_columns k
                 WHERE k.constraint_object_id = fk.[object_id]
                 FOR XML PATH(''), TYPE).value('.', 'NVARCHAR(MAX)'), 1, 2, '')
@@ -123,7 +124,7 @@ SELECT @SQL = 'CREATE TABLE ' + @object_name +'(' + CHAR(10) + STUFF((
                 WHEN fk.update_referential_action = 3 THEN ' ON UPDATE SET DEFAULT'  
                 ELSE '' 
               END 
-            + CHAR(13) + 'ALTER TABLE ' + @object_name + ' CHECK CONSTRAINT [' + fk.name  + ']' + CHAR(13)
+            + CHAR(13) + 'ALTER TABLE ' + @object_name + ' CHECK CONSTRAINT ' + quotename(fk.name) + CHAR(13)
         FROM sys.foreign_keys fk WITH (NOWAIT)
 			JOIN sys.objects ro WITH (NOWAIT) ON ro.[object_id] = fk.referenced_object_id
         WHERE fk.parent_object_id = @object_id
@@ -131,16 +132,16 @@ SELECT @SQL = 'CREATE TABLE ' + @object_name +'(' + CHAR(10) + STUFF((
         FOR XML PATH(N''), TYPE).value('.', 'NVARCHAR(MAX)')), '')
     + ISNULL(((SELECT
          CHAR(13) + 'CREATE' + CASE WHEN i.is_unique = 1 THEN ' UNIQUE' ELSE '' END 
-                + ' NONCLUSTERED INDEX [' + i.name + '] ON ' + @object_name + ' (' +
+                + ' NONCLUSTERED INDEX ' + quotename(i.name) + ' ON ' + @object_name + ' (' +
                 STUFF((
-                SELECT ', [' + c.name + ']' + CASE WHEN c.is_descending_key = 1 THEN ' DESC' ELSE ' ASC' END
+                SELECT ', ' + quotename(c.name) + CASE WHEN c.is_descending_key = 1 THEN ' DESC' ELSE ' ASC' END
                 FROM index_column c
                 WHERE c.is_included_column = 0
                     AND c.index_id = i.index_id
                 FOR XML PATH(''), TYPE).value('.', 'NVARCHAR(MAX)'), 1, 2, '') + ')'  
                 + ISNULL(CHAR(13) + 'INCLUDE (' + 
                     STUFF((
-                    SELECT ', [' + c.name + ']'
+                    SELECT ', ' + quotename(c.name)
                     FROM index_column c
                     WHERE c.is_included_column = 1
                         AND c.index_id = i.index_id

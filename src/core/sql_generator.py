@@ -127,12 +127,17 @@ class sql_generator:
             with open(tables_path, 'r',  encoding='utf-8') as sql_file:
                 query += sql_file.read()
             
-            script = self.db.execute(query)
+            try:
             
-            tbl_script = ""
+                script = self.db.execute(query)
+            
+                tbl_script = ""
 
-            for row in script:
-                tbl_script += row[0]
+                for row in script:
+                    tbl_script += row[0]
+            
+            except Exception as ex:
+                tbl_script = "-- Error generating script:\n" + '-- '+ str(ex)
             
             tbl_script += "\n"
             
