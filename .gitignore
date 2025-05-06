@@ -17,7 +17,7 @@ __pycache__/
 # ─── CONFIG DE PYINSTALLER ────────────────
 build/
 dist/
-*.spec
+
 
 # ─── ARCHIVOS TEMPORALES / SISTEMA ───────
 .DS_Store
