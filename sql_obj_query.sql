@@ -1,13 +1,14 @@
-
    --DECLARE @Init_Date AS DATETIME
    --DECLARE @End_Date AS DATETIME 
    --DECLARE @Object_Key AS VARCHAR(10) = 'SP;TBL;FN'
    --DECLARE @Name as varchar(max) 
    --DECLARE @Schema as varchar(max) 
+   --DECLARE @FilterType as varchar(max) 
 
 -- Validaciones de campos
 IF (LEN(@Object_Key) = 0 ) SET @Object_Key = NULL 
 IF (LEN(@Name) = 0 ) SET @Name = NULL 
+IF (LEN(@FilterType) = 0 ) SET @FilterType = NULL
 IF (@End_Date is not null) SET @End_Date = DATEADD(MINUTE, -1, DATEADD(DAY, 1, @End_Date)) 
 
 SET NOCOUNT ON;
@@ -40,8 +41,8 @@ WHERE ( -- Filtro de fechas
 		 OR (@Init_Date IS NULL AND modify_date <= @End_Date) -- Solo fecha inicio
 	)
 	AND (@Object_Key IS NULL OR @Object_Key LIKE '%TBL%')
-	AND (@Name is null OR name like '%' + @Name + '%')
 	AND (@Schema IS NULL OR SCHEMA_NAME(schema_id) like '%' + @Schema + '%')
+	AND (@Name IS NULL OR (@FilterType = 'Name' AND name LIKE '%' + @Name + '%'))
 ORDER BY name
 
 -- Obtener Procedimientos Almacendos
@@ -63,8 +64,12 @@ WHERE ( -- Filtro de fechas
 		 OR (@Init_Date IS NULL AND modify_date <= @End_Date) -- Solo fecha inicio
 	)
 	AND (@Object_Key IS NULL OR @Object_Key LIKE '%SP%')
-	AND (@Name is null OR name like '%' + @Name + '%')
 	AND (@Schema IS NULL OR SCHEMA_NAME(schema_id) like '%' + @Schema + '%')
+	AND (@Name IS NULL
+		OR (@FilterType = 'Name' AND p.name LIKE '%' + @Name + '%'	)
+		OR (@FilterType = 'Content' AND M.definition LIKE '%' + @Name + '%')
+		OR (@FilterType IS NULL AND (p.name LIKE '%' + @Name + '%' OR M.definition LIKE '%' + @Name + '%'))
+		)
 ORDER BY name
 
 -- Obtener Funciones

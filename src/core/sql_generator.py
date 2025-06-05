@@ -50,10 +50,25 @@ class sql_generator:
             
             #Escribir archivos  
             if(not self.clipboard):
-                sql_name = "Scripts_SQL" + datetime.now() + ".sql"
-                filename = os.path.join(self.download_path.strip().strip('"'), sql_name)
-                with open(filename,'w',encoding="utf-8") as file:
+                
+                base_name = f"Scripts_SQL_{datetime.now().strftime('%d_%m_%Y')}.sql"
+                download_path = self.download_path.strip().strip('"')
+                filename = os.path.join(download_path, base_name)
+                # Si el archivo ya existe, agrega sufijos (1), (2), etc.
+                counter = 1
+                while os.path.exists(filename):
+                    name_only, ext = os.path.splitext(base_name)
+                    filename = os.path.join(download_path, f"{name_only}_{counter}{ext}")
+                    counter += 1
+
+                # Guardar el archivo
+                with open(filename, 'w', encoding="utf-8") as file:
                     file.write(scripts)
+
+                # sql_name = "Scripts_SQL" + datetime.now() + ".sql"
+                # filename = os.path.join(self.download_path.strip().strip('"'), sql_name)
+                # with open(filename,'w',encoding="utf-8") as file:
+                #     file.write(scripts)
                 message = "File successfully generated"
                 return True, message, None
             #Portapapeles

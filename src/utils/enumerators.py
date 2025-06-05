@@ -21,4 +21,7 @@ class table_get_options(Enum):
     Data_Only = "Data Only"
     Schema_Data = "Schema and Data"
     Schema_Only = "Schema Only"
-    # test = "Scddddddddddddddddddddhema Only"
+
+class filter_types(Enum):
+    Name = "Name"
+    Content = "Content (SP)"

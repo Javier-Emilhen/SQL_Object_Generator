@@ -1,8 +1,10 @@
+from pathlib import Path
 import flet as ft
 from src.core.sql_search_engine import sql_search_engine
 from src.core.sql_generator import sql_generator
 from src.utils.enumerators import object_types
 from src.utils.enumerators import table_get_options
+from src.utils.enumerators import filter_types
 from src.utils.validators import validators
 from src.gui.components.config_menu import show_config_alert
 from src.gui.components.list_view_table import list_view_table
@@ -26,6 +28,7 @@ def main(page: ft.Page):
     _alert_message = alert_message(page)
         
     #Funciones
+        
     def on_change_tipo_checkboxes(e):
         selected_chboxs = [cb for cb in object_types_checkboxes if cb.value]
         if len(selected_chboxs) == 0 and not e.control.value:
@@ -125,6 +128,7 @@ def main(page: ft.Page):
                 page.set_clipboard(scripts)
                 content = ft.Text(message)
             else:
+                _settings.set_download_path(path_txt_field.value)
                 content = btn_open_file_explorer(message, path_txt_field.value)
             
         _alert_message.show(content)
@@ -143,12 +147,16 @@ def main(page: ft.Page):
                 init_date_txt_field.value, 
                 end_date_txt_field.value,
                 object_type, 
-                schema_txt_field.value)
+                schema_txt_field.value,
+                filter_type_checkbox.value)
             
             sql_data = search_engine.find_sql_objects()
 
             # Load data in the list view
             load_data(sql_data)
+            
+            generate_button.disabled = True
+            generate_button.update()
             
             totals_txt_field.value= len(sql_data)
             selected_items_txt_field.value = None
@@ -208,15 +216,24 @@ def main(page: ft.Page):
     )
     
     filter_txt_field = ft.TextField(
-        label="Filtro de nombre",
+        label="Text filter",
         value="",
         border=ft.border.all(1, ft.colors.GREY)
+    )
+    
+    filter_type_checkbox = ft.Dropdown(
+        label= "Filter type",
+        # options=[ft.DropdownOption(key="ByName", text="By Name"), ft.DropdownOption(key="ByContent", text="By Content (SP)")],
+        options=[ft.DropdownOption(key=option.name, text=option.value) for option in filter_types],
+          value= filter_types.Name.name,
+        expand=False
     )
 
     path_txt_field = ft.TextField(
         label="Download Path",
         hint_text="Example: C:\Downloads",
         # value="C:\\Users\\javierrodriguez\\Downloads\\Test",
+        value = _settings.get_download_path(),
         border=ft.border.all(1, ft.colors.GREY),
         disabled=True
     )
@@ -261,7 +278,7 @@ def main(page: ft.Page):
     # )
     
     table_options_dropdown = ft.Dropdown(
-        label= "Table Options",
+        label= "Options",
         options=[ft.DropdownOption(key=option.name, text=option.value) for option in table_get_options],
         value= table_get_options.Schema_Only.name,
         expand=False
@@ -340,13 +357,19 @@ def main(page: ft.Page):
                     ft.Container(
                         content=schema_txt_field,
                         padding=5,
-                        col={"sm": 2, "md": 4, "xl": 2},
+                        col={"sm": 2, "md": 4, "xl": 1},
                     ),
                     ft.Container(
                         content=filter_txt_field,
                         padding=5,
-                        col={"sm": 10, "md": 4, "xl":4},
+                        col={"sm": 8, "md": 4, "xl":3},
                     ),
+                     ft.Container(
+                       content=filter_type_checkbox,
+                    #    border=ft.border.all(1, ft.colors.RED),
+                       expand=True,
+                       col={"sm": 2, "md": 5, "xl": 2},
+                       ),
                     
                     ft.Container(
                         content=ft.Row(object_types_checkboxes, alignment=ft.MainAxisAlignment.CENTER),
@@ -360,7 +383,7 @@ def main(page: ft.Page):
                     #    border=ft.border.all(1, ft.colors.RED),
                        expand=True,
                        col={"sm": 4, "md": 5, "xl": 3},
-                       ),
+                       )
                 ],
                 spacing= 15
             ),

@@ -30,7 +30,8 @@ cross apply
          when DATA_TYPE='xml' then 'CASE WHEN [' + column_name+'] IS NULL THEN ''NULL'' ELSE ''''''''+REPLACE(CONVERT(NVARCHAR(MAX),[' + COLUMN_NAME + ']),'''''''','''''''''''')+'''''''' END '
          when DATA_TYPE='text' then 'CASE WHEN [' + column_name+'] IS NULL THEN ''NULL'' ELSE ''''''''+REPLACE(CONVERT(NVARCHAR(MAX),[' + COLUMN_NAME + ']),'''''''','''''''''''')+'''''''' END '
          WHEN DATA_TYPE='image' then 'CASE WHEN [' + column_name+'] IS NULL THEN ''NULL'' ELSE ''''''''+CONVERT(NVARCHAR(MAX),CONVERT(VARBINARY(MAX),[' + COLUMN_NAME + ']),1)+'''''''' END '
-         WHEN DATA_TYPE='varbinary' then 'CASE WHEN [' + column_name+'] IS NULL THEN ''NULL'' ELSE ''''''''+CONVERT(NVARCHAR(MAX),[' + COLUMN_NAME + '],1)+'''''''' END '
+         WHEN DATA_TYPE = 'varbinary' THEN 'CASE WHEN [' + column_name + '] IS NULL THEN ''NULL'' ELSE ''0x'' + LOWER(CONVERT(VARCHAR(MAX), [' + column_name + '], 2)) END'
+		 --WHEN DATA_TYPE='varbinary' then 'CASE WHEN [' + column_name+'] IS NULL THEN ''NULL'' ELSE ''''''''+CONVERT(NVARCHAR(MAX),[' + COLUMN_NAME + '],1)+'''''''' END '
          WHEN DATA_TYPE='binary' then 'CASE WHEN [' + column_name+'] IS NULL THEN ''NULL'' ELSE ''''''''+CONVERT(NVARCHAR(MAX),[' + COLUMN_NAME + '],1)+'''''''' END '
          when DATA_TYPE='time' then 'CASE WHEN [' + column_name+'] IS NULL THEN ''NULL'' ELSE ''''''''+CONVERT(NVARCHAR(MAX),[' + COLUMN_NAME + '])+'''''''' END '
          ELSE 'CASE WHEN [' + column_name+'] IS NULL THEN ''NULL'' ELSE CONVERT(NVARCHAR(MAX),['+column_name+']) END' end

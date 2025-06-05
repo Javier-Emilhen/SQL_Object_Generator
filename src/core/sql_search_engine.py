@@ -8,12 +8,13 @@ from src.utils.enumerators import sql_definitions
 
 class sql_search_engine:
 
-    def __init__(self, filter_text, init_date, end_date, object_type, schema ):
+    def __init__(self, filter_text, init_date, end_date, object_type, schema, filter_type ):
         self.filter_text = filter_text
         self.init_date = init_date
         self.end_date = end_date
         self.object_type = object_type
         self.schema = schema
+        self.filter_type = filter_type
         
         self.db = sql_class()
         self.db.connect()
@@ -26,6 +27,7 @@ class sql_search_engine:
             f"DECLARE @End_Date AS DATETIME;\n",
             f"DECLARE @Object_Key AS varchar(10);\n"
             f"DECLARE @Schema AS varchar(max);\n"
+            f"DECLARE @FilterType as varchar(max);\n"
         ]
 
         if (len(self.filter_text) > 0):
@@ -33,6 +35,9 @@ class sql_search_engine:
         
         if (len(self.schema) > 0):
             input_params.append(F"SET @Schema = '{self.schema}'; \n")
+            
+        if (len(self.filter_type) > 0):
+            input_params.append(F"SET @FilterType = '{self.filter_type}'; \n")
             
         if (len(self.init_date) > 0):
             date = datetime.strptime(self.init_date, "%d/%m/%Y")

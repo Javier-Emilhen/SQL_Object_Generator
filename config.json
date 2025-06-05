@@ -1,8 +1,9 @@
 {
     "db_config": {
-        "server": ".\\MSSQL2019",
-        "username": "sa",
-        "password": "Nadabueno#1",
-        "database": "InventarioActivos"
-    }
+        "server": "",
+        "username": "",
+        "password": "",
+        "database": ""
+    },
+    "download_path": ""
 }

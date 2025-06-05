@@ -6,7 +6,7 @@ from src.sql.connection import sql_class
 # from src.gui.components.alert_loading import loading_alert
 
 _settings = settings()
-CONFIG_PATH = Path(_settings.get_config_file_path())
+CONFIG_PATH = _settings.ensure_config_available()
 
 def load_data():
     with open(CONFIG_PATH, "r", encoding="utf-8") as f:
