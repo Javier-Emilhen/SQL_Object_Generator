@@ -16,7 +16,6 @@ class settings:
     def get_db_config(self):
         with open(self.config_path,'r') as config_file:
             config = json.load(config_file)
-            
         return config.get("db_config")
     
     def get_db_name(self):
@@ -54,20 +53,15 @@ class settings:
             
             
     #Installed App
-    
     def get_user_config_path(self):
-        # Ruta segura para guardar el archivo (editable por el usuario)
         appdata_dir = os.path.join(os.getenv("APPDATA"), "SQLObjectGenerator")
         os.makedirs(appdata_dir, exist_ok=True)
         return os.path.join(appdata_dir, "config.json")
     
     def get_installed_config_path(self):
-        # Ruta del archivo junto al ejecutable (solo lectura)
         if getattr(sys, 'frozen', False):
-            # Cuando está empaquetado con PyInstaller
             base_path = sys._MEIPASS
         else:
-            # En modo desarrollo
             base_path = os.path.dirname(__file__)
         return os.path.join(base_path, "config.json")
     

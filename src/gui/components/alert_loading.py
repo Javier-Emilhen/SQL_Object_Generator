@@ -12,8 +12,8 @@ class loading_alert:
                     ft.Container(
                         content=ft.Column(
                             [
-                                ft.Text("Loading...", size=20, color=ft.colors.WHITE, weight=ft.FontWeight.BOLD),
-                                ft.ProgressRing(color=ft.colors.WHITE, width=50, height=50),
+                                ft.Text("Loading...", size=20, color=ft.Colors.WHITE, weight=ft.FontWeight.BOLD),
+                                ft.ProgressRing(color=ft.Colors.WHITE, width=50, height=50),
                             ],
                             alignment=ft.MainAxisAlignment.CENTER,
                             horizontal_alignment=ft.CrossAxisAlignment.CENTER

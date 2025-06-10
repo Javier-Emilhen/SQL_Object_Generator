@@ -3,7 +3,7 @@ from src.models.sql_objects import sql_objects
 
 def list_view_table(on_select_all = None, on_select_row = None, columns= None):
 
-    _select_all_checkbox = ft.Checkbox(value=False, on_change=on_select_all, width=100)
+    _select_all_checkbox = ft.Checkbox(value=False, on_change=on_select_all, width=30)
 
     _data_checkbox = []
     
@@ -25,8 +25,8 @@ def list_view_table(on_select_all = None, on_select_row = None, columns= None):
     
     #List View (Table)
     titles_list_view = ft.Container(
-        bgcolor=ft.colors.BLUE_GREY_800,
-        border= ft.border.all(2,ft.colors.BLUE_GREY_800),
+        bgcolor=ft.Colors.BLUE_GREY_800,
+        border= ft.border.all(2,ft.Colors.BLUE_GREY_800),
         border_radius=10,
         padding=5,
         content=ft.Row(controls=rows)
@@ -49,7 +49,7 @@ def list_view_table(on_select_all = None, on_select_row = None, columns= None):
         for obj in data:
                 checkbox = ft.Checkbox(
                     value=False,
-                    width=100,
+                    width=30,
                     on_change=lambda e, x=obj: on_select_row(x, e.control.value)
                 )
 
@@ -57,7 +57,7 @@ def list_view_table(on_select_all = None, on_select_row = None, columns= None):
 
                 fila = ft.Container(
                     padding=2,
-                    border=ft.border.only(bottom=ft.BorderSide(1, ft.colors.BLUE_GREY_800)),
+                    border=ft.border.only(bottom=ft.BorderSide(1, ft.Colors.BLUE_GREY_800)),
                     content=ft.Row([
                         checkbox,
                         ft.Text(str(obj.ID), width=120, text_align=ft.TextAlign.CENTER, selectable=True),

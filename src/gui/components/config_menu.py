@@ -3,7 +3,6 @@ import json
 from pathlib import Path
 from src.config.config import settings
 from src.sql.connection import sql_class
-# from src.gui.components.alert_loading import loading_alert
 
 _settings = settings()
 CONFIG_PATH = _settings.ensure_config_available()
@@ -18,8 +17,6 @@ def save_data(data):
         json.dump(data, f, indent=4)
 
 def show_config_alert(page: ft.Page, on_close=None):
-    
-    
     
     def on_change_validate(e):
         if(not e.data or e.data == ""):
@@ -37,9 +34,12 @@ def show_config_alert(page: ft.Page, on_close=None):
         
     def on_click_save(e):
 
+        disable_controls(True)
+
         result = test_connection()
         
         if not result:
+            disable_controls(False)
             return
         
         config["db_config"] = {
@@ -58,10 +58,12 @@ def show_config_alert(page: ft.Page, on_close=None):
         page.update()
     
     def on_click_test(e):
+        disable_controls(True)
         test_connection()
+        disable_controls(False)
     
     def test_connection():
-    
+        
         #Validate Controls
         controls = [text_server,text_user,txt_password,txt_db]
         
@@ -79,14 +81,30 @@ def show_config_alert(page: ft.Page, on_close=None):
         message_container.visible = True
         
         if(not result):
-            message_text.color = ft.colors.RED
+            message_text.color = ft.Colors.RED
         else:
-            message_text.color = ft.colors.GREEN
+            message_text.color = ft.Colors.GREEN
         
         message_container.update()
         message_text.update()
         
         return result
+    
+    def disable_controls(disabled: bool):
+        text_server.disabled = disabled
+        text_user.disabled = disabled
+        txt_password.disabled = disabled
+        txt_db.disabled = disabled
+        
+        if(disabled):
+            message_text.value = "Loading..."
+            message_text.color = ft.Colors.WHITE
+        
+        text_server.update()
+        text_user.update()
+        txt_password.update()
+        txt_db.update()
+        message_text.update()
         
     config = load_data()
     db_config = config.get("db_config", {})
@@ -111,7 +129,7 @@ def show_config_alert(page: ft.Page, on_close=None):
         ],
         visible=False
     )
-    
+        
     dlg = ft.AlertDialog(
         modal=True,
         content_padding=20,

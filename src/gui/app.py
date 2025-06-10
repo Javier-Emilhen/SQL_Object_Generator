@@ -212,13 +212,13 @@ def main(page: ft.Page):
     schema_txt_field = ft.TextField( 
         label="Schema",
         value="",
-        border=ft.border.all(1, ft.colors.GREY)
+        border=ft.border.all(1, ft.Colors.GREY)
     )
     
     filter_txt_field = ft.TextField(
         label="Text filter",
         value="",
-        border=ft.border.all(1, ft.colors.GREY)
+        border=ft.border.all(1, ft.Colors.GREY)
     )
     
     filter_type_checkbox = ft.Dropdown(
@@ -234,7 +234,7 @@ def main(page: ft.Page):
         hint_text="Example: C:\Downloads",
         # value="C:\\Users\\javierrodriguez\\Downloads\\Test",
         value = _settings.get_download_path(),
-        border=ft.border.all(1, ft.colors.GREY),
+        border=ft.border.all(1, ft.Colors.GREY),
         disabled=True
     )
     add_path_picker(page, path_txt_field)
@@ -242,11 +242,11 @@ def main(page: ft.Page):
     init_date_txt_field = ft.TextField(
         label="Modification init date",
         # value='08/04/2025',
-        border=ft.border.all(1, ft.colors.GREY),
+        border=ft.border.all(1, ft.Colors.GREY),
         max_length=10,
         on_change= validate_date,
         suffix_icon=ft.IconButton(
-            icon=ft.icons.CALENDAR_MONTH, 
+            icon=ft.Icons.CALENDAR_MONTH, 
             on_click=lambda e:page.open(ft.DatePicker(
                 on_change= lambda e: on_change_date(e,init_date_txt_field)
                 )))
@@ -254,11 +254,11 @@ def main(page: ft.Page):
     
     end_date_txt_field = ft.TextField(
         label="Modification end date",
-        border=ft.border.all(1, ft.colors.GREY),
+        border=ft.border.all(1, ft.Colors.GREY),
         max_length=10,
         on_change= validate_date,
         suffix_icon= ft.IconButton(
-            icon=ft.icons.CALENDAR_MONTH, 
+            icon=ft.Icons.CALENDAR_MONTH, 
             on_click=lambda e:page.open(ft.DatePicker(
                 on_change= lambda e: on_change_date(e,end_date_txt_field)
                 )))
@@ -288,7 +288,7 @@ def main(page: ft.Page):
     
     search_btn = ft.ElevatedButton(
         text = "Search",
-        icon = ft.icons.SEARCH_OUTLINED,
+        icon = ft.Icons.SEARCH_OUTLINED,
         width= 150,
         height= 40,
         on_click=on_click_search
@@ -296,7 +296,7 @@ def main(page: ft.Page):
 
     generate_button = ft.ElevatedButton(
         text = "Generate",
-        icon = ft.icons.DOWNLOAD,
+        icon = ft.Icons.DOWNLOAD,
         width= 150,
         height= 40,
         disabled=True,
@@ -305,7 +305,7 @@ def main(page: ft.Page):
     
     settings_btn = ft.ElevatedButton(
         "Settings", 
-        ft.icons.SETTINGS, 
+        ft.Icons.SETTINGS, 
         on_click= lambda e: show_config_alert(page,on_close_config),  
         width= 150,
         height= 40
@@ -366,21 +366,20 @@ def main(page: ft.Page):
                     ),
                      ft.Container(
                        content=filter_type_checkbox,
-                    #    border=ft.border.all(1, ft.colors.RED),
+                    #    border=ft.border.all(1, ft.Colors.RED),
                        expand=True,
                        col={"sm": 2, "md": 5, "xl": 2},
                        ),
-                    
                     ft.Container(
                         content=ft.Row(object_types_checkboxes, alignment=ft.MainAxisAlignment.CENTER),
                         margin=ft.margin.only(top=10),
                         padding=5,
-                        # border=ft.border.all(1, ft.colors.RED),
+                        # border=ft.border.all(1, ft.Colors.RED),
                         col={"sm": 12, "md": 4, "xl": 3},
                     ),
                     ft.Container(
                        content=table_options_dropdown,
-                    #    border=ft.border.all(1, ft.colors.RED),
+                    #    border=ft.border.all(1, ft.Colors.RED),
                        expand=True,
                        col={"sm": 4, "md": 5, "xl": 3},
                        )

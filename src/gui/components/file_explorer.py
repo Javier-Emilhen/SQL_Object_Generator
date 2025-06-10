@@ -8,8 +8,8 @@ def btn_open_file_explorer(message, path):
             ft.TextButton(
                 "Open Folder",
                 style=ft.ButtonStyle(
-                    color=ft.colors.BLUE,
-                    overlay_color=ft.colors.TRANSPARENT,
+                    color=ft.Colors.BLUE,
+                    overlay_color=ft.Colors.TRANSPARENT,
                     padding=0,
                     shape=ft.RoundedRectangleBorder(radius=0),
                     side=None,
@@ -38,7 +38,7 @@ def add_path_picker(page: ft.Page, path_text_field: ft.TextField):
     page.update()
     
     path_text_field.suffix_icon = ft.IconButton(
-        icon=ft.icons.FOLDER_OPEN,
+        icon=ft.Icons.FOLDER_OPEN,
         on_click=lambda e: file_picker.get_directory_path()
     )
         

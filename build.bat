@@ -15,7 +15,8 @@ REM Instalar dependencias si fuera necesario
 REM pip install -r requirements.txt
 
 REM Ejecutar PyInstaller con el archivo .spec existente
-pyinstaller build.spec
+REM pyinstaller build.spec
+pyinstaller --noconfirm --clean build.spec
 
 echo =============================
 echo  BUILD COMPLETADO!
