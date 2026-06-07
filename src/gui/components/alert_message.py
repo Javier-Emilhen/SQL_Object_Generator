@@ -7,7 +7,8 @@ class alert_message:
         self.dialog = ft.AlertDialog(
             modal=True,
             title=ft.Text("Information"),
-            actions=[ft.TextButton("Ok", on_click=lambda e: page.close(self.dialog))],
+            # actions=[ft.TextButton("Ok", on_click=lambda e: page.close(self.dialog))],
+            actions=[ft.TextButton("Ok", on_click=lambda e: self.hide())],
             actions_alignment=ft.MainAxisAlignment.END
         )
         
@@ -21,8 +22,11 @@ class alert_message:
         else:
             self.dialog.content = content
         
-        self.dialog.update()
-        self.page.open(self.dialog)
+        self.dialog.open = True
+        self.page.update()
+        # self.page.open(self.dialog)
         
     def hide(self):
-        self.page.close(self.dialog)
+        self.dialog.open = False
+        self.page.update()
+        # self.page.close(self.dialog)

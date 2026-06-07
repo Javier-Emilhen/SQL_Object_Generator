@@ -1,5 +1,7 @@
 # -*- mode: python ; coding: utf-8 -*-
 
+block_cipher = None
+
 a = Analysis(
     ['main.py'],
     pathex=[],
@@ -10,25 +12,34 @@ a = Analysis(
         ('sql_tables_query.sql', '.'),
         ('sql_table_records.sql', '.'),
         ('sql_table_records_filtered.sql', '.'),
-        ('assets/favicon.ico', 'assets')
+        ('assets/icon.ico', 'assets'),
+        ('src/config/config.json', '.'),
     ],
     hiddenimports=[
-        'pyodbc'
+        'flet',
+        'flet.core',
+        'flet.desktop',
+        'pyodbc',
+        'cryptography',
+        'cryptography.fernet',
     ],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
     excludes=[],
+    win_no_prefer_redirects=False,
+    win_private_assemblies=False,
+    cipher=block_cipher,
     noarchive=False,
-    optimize=0,
 )
 
-pyz = PYZ(a.pure)
+pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 
 exe = EXE(
     pyz,
     a.scripts,
     a.binaries,
+    a.zipfiles,
     a.datas,
     [],
     name='SQL Object Generator',
@@ -38,13 +49,13 @@ exe = EXE(
     upx=True,
     upx_exclude=[],
     runtime_tmpdir=None,
-    console=False,  # Oculta consola, útil para GUI
+    console=False,  # Sin ventana de consola
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon='assets/favicon.ico'
+    manifest='app.manifest',
+    icon='assets/icon.ico',
+    version='version_info.txt'
 )
-
-

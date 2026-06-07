@@ -15,7 +15,8 @@ class sql_definitions(Enum):
     FUNCTIONS_FILE = 'sql_fn_query.sql'
     TABLES_FILE = 'sql_tables_query.sql'
     SP_FILE = 'EXEC sp_helptext'
-    TABLE_RECORDS = 'sql_table_records.sql'
+    TABLE_RECORDS          = 'sql_table_records.sql'
+    TABLE_RECORDS_FILTERED = 'sql_table_records_filtered.sql'
     
 class table_get_options(Enum):
     Data_Only = "Data Only"

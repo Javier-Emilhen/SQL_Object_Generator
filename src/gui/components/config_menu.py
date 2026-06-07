@@ -11,115 +11,38 @@ def load_data():
     with open(CONFIG_PATH, "r", encoding="utf-8") as f:
         return json.load(f)
          
-
 def save_data(data):
     with open(CONFIG_PATH, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=4)
 
 def show_config_alert(page: ft.Page, on_close=None):
-    
-    def on_change_validate(e):
-        if(not e.data or e.data == ""):
-            e.control.error_text = "This field is required"
-        else:
-            e.control.error_text = None
-        e.control.update()
-    
-    def validate_value(control):
-        if(not control.value or control.value == ""):
-            control.error_text = "This field is required"
-        else:
-            control.error_text = None
-        control.update()
-        
-    def on_click_save(e):
 
-        disable_controls(True)
+    db_config = _settings.get_db_config() or {}
+    
+    # Inputs
+    text_server = ft.TextField(label="Server", value=db_config.get("server", ""), on_change=lambda e: reload_databases())
+    text_user = ft.TextField(label="Username", value=db_config.get("username", ""), on_change=lambda e: reload_databases())
+    txt_password = ft.TextField(label="Password", value=db_config.get("password", ""), password=True, can_reveal_password=True, on_change=lambda e: reload_databases())
 
-        result = test_connection()
-        
-        if not result:
-            disable_controls(False)
-            return
-        
-        config["db_config"] = {
-            "server": text_server.value,
-            "username": text_user.value,
-            "password": txt_password.value,
-            "database": txt_db.value
-        }
-        
-        save_data(config)
-        
-        if on_close:
-            on_close()
-            
-        page.close(dlg)
-        page.update()
-    
-    def on_click_test(e):
-        disable_controls(True)
-        test_connection()
-        disable_controls(False)
-    
-    def test_connection():
-        
-        #Validate Controls
-        controls = [text_server,text_user,txt_password,txt_db]
-        
-        for control in controls:
-            validate_value(control)
-        
-        if(any(c.error_text for c in controls)):
-            return False
-    
-        #Test connection
-        db = sql_class()
-        result, message = db.test_connection(server= text_server.value, username= text_user.value, password=txt_password.value, database=txt_db.value)
-        
-        message_text.value = message
-        message_container.visible = True
-        
-        if(not result):
-            message_text.color = ft.Colors.RED
-        else:
-            message_text.color = ft.Colors.GREEN
-        
-        message_container.update()
-        message_text.update()
-        
-        return result
-    
-    def disable_controls(disabled: bool):
-        text_server.disabled = disabled
-        text_user.disabled = disabled
-        txt_password.disabled = disabled
-        txt_db.disabled = disabled
-        
-        if(disabled):
-            message_text.value = "Loading..."
-            message_text.color = ft.Colors.WHITE
-        
-        text_server.update()
-        text_user.update()
-        txt_password.update()
-        txt_db.update()
-        message_text.update()
-        
-    config = load_data()
-    db_config = config.get("db_config", {})
-    text_server = ft.TextField(label="Server", value=db_config["server"], on_change=on_change_validate)
-    text_user = ft.TextField(label="Username", value=db_config["username"], on_change=on_change_validate)
-    txt_password = ft.TextField(label="Password", value=db_config["password"], password=True, can_reveal_password=True, on_change=on_change_validate)
-    txt_db = ft.TextField(label="Database", value= db_config["database"], on_change=on_change_validate)
+    _saved_db = db_config.get("database") or None
+    dd_db = ft.Dropdown(
+        label="Database",
+        # value=_saved_db,
+        options=[ft.DropdownOption(_saved_db)] if _saved_db else [],
+        expand=True,
+        editable=True
+    )
 
+    inputs = [text_server, text_user, txt_password]
+
+    # Validation messages
     message_text = ft.Text(
         selectable=True,
-        value="", 
+        value="",
         overflow= ft.TextOverflow.VISIBLE,
         no_wrap=True
     )
-    
+
     message_container = ft.ResponsiveRow(
         controls=[ft.Column(
             [message_text],
@@ -129,7 +52,119 @@ def show_config_alert(page: ft.Page, on_close=None):
         ],
         visible=False
     )
+
+        # --- Helper functions
+    def validate_fields():
+        valid = True
+        for field in inputs:
+            if not (field.value or "").strip():
+                field.error_text = "This field is required"
+                valid = False
+            else:
+                field.error_text = None
+            field.update()
+        if dd_db.value == " ":
+            dd_db.error_text = "This field is required"
+            dd_db.update()
+            valid = False
+        elif dd_db.error_text:
+            dd_db.error_text = None
+            dd_db.update()
+        return valid
+
+    def disable_controls(disabled: bool):
+        for field in inputs:
+            field.disabled = disabled
+            field.update()
+
+        if(disabled):
+            message_container.visible = True
+            message_text.value = "Loading..." if disabled else ""
+            message_text.color = ft.Colors.WHITE
+            message_text.update()
+    
+    # def on_change_validate(e):
+    #     if(not e.data or e.data == ""):
+    #         e.control.error_text = "This field is required"
+    #     else:
+    #         e.control.error_text = None
+    #     e.control.update()
+    
+    _empty_option = ft.DropdownOption(key="", text=" ")
+
+    def reload_databases(preselect=None):
+        dd_db.options = [_empty_option]
+        dd_db.value = " "
+        dd_db.update()
+        if not all([text_server.value.strip(), text_user.value.strip(), txt_password.value.strip()]):
+            return
+        db = sql_class()
+        databases, _ = db.list_databases(
+            server=text_server.value,
+            username=text_user.value,
+            password=txt_password.value,
+        )
+        # dd_db.options = [_empty_option] + [ft.DropdownOption(d) for d in databases]
+        dd_db.options =[ft.DropdownOption(d) for d in databases]
+        dd_db.value = preselect if preselect and preselect in databases else " "
+        dd_db.update()
+
+    def test_connection():
         
+        #Validate Controls
+        if not validate_fields():
+            return False
+
+        #Test connection
+        db = sql_class()
+        result, message = db.test_connection(
+            server= text_server.value,
+            username= text_user.value,
+            password=txt_password.value,
+            database=dd_db.value
+        )
+        
+        message_text.value = message
+        message_container.visible = True
+        message_text.color = ft.Colors.GREEN if result else ft.Colors.RED
+        
+        message_container.update()
+        message_text.update()
+        
+        return result
+    
+    def on_click_test(e):
+        disable_controls(True)
+        test_connection()
+        disable_controls(False)
+        
+    def on_click_save(e):
+
+        disable_controls(True)
+
+        if not test_connection():
+            disable_controls(False)
+            return
+
+        _settings.save_db_config(
+            server=text_server.value,
+            username=text_user.value,
+            password=txt_password.value,
+            database=dd_db.value
+        )
+        sql_class.invalidate_cache()
+        
+        if on_close:
+            on_close()
+            
+        dlg.open = False
+        page.update()
+    
+    def on_click_cancel(e):
+        dlg.open = False
+        page.update()
+    
+    # Dialog definition
     dlg = ft.AlertDialog(
         modal=True,
         content_padding=20,
@@ -139,7 +174,7 @@ def show_config_alert(page: ft.Page, on_close=None):
             text_server,
             text_user,
             txt_password,
-            txt_db,
+            dd_db,
             message_container
         ], tight=True, spacing=20),
         actions_alignment=ft.MainAxisAlignment.END,
@@ -149,13 +184,19 @@ def show_config_alert(page: ft.Page, on_close=None):
                  ft.Container(
                      ft.TextButton("Test connection", on_click=on_click_test)),
                  ft.Container(ft.Row([
-                        ft.TextButton("Cancel", on_click=lambda e: setattr(dlg, "open", False) or page.update()),
+                        ft.TextButton("Cancel", on_click=on_click_cancel),
                         ft.ElevatedButton("Save", on_click=on_click_save)]))
                 ],
                 alignment= ft.MainAxisAlignment.SPACE_BETWEEN, 
             )
         ]
     )
+    
+    if dlg not in page.overlay: page.overlay.append(dlg)
 
-    page.open(dlg)
+    dlg.open = True
     page.update()
+
+    reload_databases(preselect=_saved_db)
+
+    # page.open(dlg)

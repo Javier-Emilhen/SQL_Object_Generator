@@ -1,20 +1,12 @@
 # -*- mode: python ; coding: utf-8 -*-
 
+
 a = Analysis(
     ['main.py'],
     pathex=[],
     binaries=[],
-    datas=[
-        ('sql_fn_query.sql', '.'),
-        ('sql_obj_query.sql', '.'),
-        ('sql_tables_query.sql', '.'),
-        ('sql_table_records.sql', '.'),
-        ('sql_table_records_filtered.sql', '.'),
-        ('assets/favicon.ico', 'assets')
-    ],
-    hiddenimports=[
-        'pyodbc'
-    ],
+    datas=[],
+    hiddenimports=[],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
@@ -22,7 +14,6 @@ a = Analysis(
     noarchive=False,
     optimize=0,
 )
-
 pyz = PYZ(a.pure)
 
 exe = EXE(
@@ -38,13 +29,12 @@ exe = EXE(
     upx=True,
     upx_exclude=[],
     runtime_tmpdir=None,
-    console=False,  # Oculta consola, útil para GUI
+    console=False,
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon='assets/favicon.ico'
+    version='C:\\Users\\JAVIER~1\\AppData\\Local\\Temp\\1dc54428-16db-43c2-927c-cdc4aa8477b9',
+    icon=['assets\\favicon.ico'],
 )
-
-

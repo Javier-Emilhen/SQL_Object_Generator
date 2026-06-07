@@ -1,4 +1,5 @@
 from pathlib import Path
+from datetime import datetime
 import flet as ft
 from src.core.sql_search_engine import sql_search_engine
 from src.core.sql_generator import sql_generator
@@ -8,23 +9,27 @@ from src.utils.enumerators import filter_types
 from src.utils.validators import validators
 from src.gui.components.config_menu import show_config_alert
 from src.gui.components.list_view_table import list_view_table
-from src.gui.components.file_explorer import btn_open_file_explorer
 from src.gui.components.file_explorer import add_path_picker
-from src.gui.components.alert_loading import loading_alert
+from src.gui.components.alert_loading import LoadingAlert
 from src.gui.components.alert_message import alert_message
+from src.gui.components.insert_exporter_view import show_insert_exporter
 from src.config.config import settings
+from src.gui.helpers import handle_generation_result, validate_required_field
 
 def main(page: ft.Page):
     page.title = "SQL Object Generator"
     page.bgcolor = ft.Colors.BLUE_GREY_900
     page.window.maximized = True
-    page.window.icon = '../assets/favicon.ico'
+    page.window.resizable = False
+    page.window.icon = '../assets/icon.ico'
+    page.window.title_bar_buttons_hidden = False
+    page.window.title_bar_hidden = False
 
     _selected_rows = set()
     _selected_types = list(object_types)
     _data_checkbox = []
     _settings = settings()
-    _alert_loading = loading_alert(page)
+    _alert_loading = LoadingAlert(page)
     _alert_message = alert_message(page)
         
     #Funciones
@@ -105,35 +110,23 @@ def main(page: ft.Page):
         selected_items_txt_field.update()
         generate_button.update()
 
-    def on_click_generate(e):   
-        
-        if path_txt_field.value == "" and not clipboard_switch.value :
-           path_txt_field.error_text ="This field is requiered."
-           path_txt_field.update()
-           return
-        else:
-            path_txt_field.error_text =None
-            path_txt_field.update()
-            
+    def on_click_generate(e):
+        if not clipboard_switch.value and not validate_required_field(path_txt_field):
+            return
+
         _alert_loading.show()
-            
+
         definition = sql_generator(path_txt_field.value, clipboard_switch.value, table_options_dropdown.value)
         result, message, scripts = definition.download(list_sql_objects=_selected_rows)
+
+        handle_generation_result(
+            page, result, message, scripts,
+            use_clipboard=clipboard_switch.value,
+            path=path_txt_field.value,
+            loading_alert=_alert_loading,
+            msg_alert=_alert_message,
+        )
         
-        if(not result):
-            content = ft.Text(message)
-        else:
-            
-            if(clipboard_switch.value):
-                page.set_clipboard(scripts)
-                content = ft.Text(message)
-            else:
-                _settings.set_download_path(path_txt_field.value)
-                content = btn_open_file_explorer(message, path_txt_field.value)
-            
-        _alert_message.show(content)
-        
-        _alert_loading.hide()
         
     def on_click_search(e):
         try:
@@ -231,7 +224,7 @@ def main(page: ft.Page):
 
     path_txt_field = ft.TextField(
         label="Download Path",
-        hint_text="Example: C:\Downloads",
+        hint_text="Example: C:\\Downloads",
         # value="C:\\Users\\javierrodriguez\\Downloads\\Test",
         value = _settings.get_download_path(),
         border=ft.border.all(1, ft.Colors.GREY),
@@ -246,9 +239,10 @@ def main(page: ft.Page):
         max_length=10,
         on_change= validate_date,
         suffix_icon=ft.IconButton(
-            icon=ft.Icons.CALENDAR_MONTH, 
-            on_click=lambda e:page.open(ft.DatePicker(
-                on_change= lambda e: on_change_date(e,init_date_txt_field)
+            icon=ft.Icons.CALENDAR_MONTH,
+            on_click=lambda e: page.open(ft.DatePicker(
+                value=datetime.strptime(init_date_txt_field.value, '%d/%m/%Y') if init_date_txt_field.value else None,
+                on_change=lambda e: on_change_date(e, init_date_txt_field)
                 )))
     )
     
@@ -260,7 +254,8 @@ def main(page: ft.Page):
         suffix_icon= ft.IconButton(
             icon=ft.Icons.CALENDAR_MONTH, 
             on_click=lambda e:page.open(ft.DatePicker(
-                on_change= lambda e: on_change_date(e,end_date_txt_field)
+                value=datetime.strptime(end_date_txt_field.value, '%d/%m/%Y') if end_date_txt_field.value else None,
+                on_change=lambda e: on_change_date(e, end_date_txt_field)
                 )))
     )
     
@@ -304,11 +299,19 @@ def main(page: ft.Page):
     )
     
     settings_btn = ft.ElevatedButton(
-        "Settings", 
-        ft.Icons.SETTINGS, 
-        on_click= lambda e: show_config_alert(page,on_close_config),  
+        "Settings",
+        ft.Icons.SETTINGS,
+        on_click= lambda e: show_config_alert(page,on_close_config),
         width= 150,
         height= 40
+    )
+
+    export_inserts_btn = ft.ElevatedButton(
+        text="Export INSERTs",
+        icon=ft.Icons.TABLE_ROWS,
+        width=160,
+        height=40,
+        on_click=lambda e: show_insert_exporter(page),
     )
     
     #Total de elementos
@@ -328,7 +331,7 @@ def main(page: ft.Page):
                     ], 
                         spacing=100),
                     ),
-                 ft.Container(ft.Row([search_btn, generate_button]))
+                 ft.Container(ft.Row([search_btn, generate_button, export_inserts_btn]))
                  ],
                 alignment= ft.MainAxisAlignment.SPACE_BETWEEN,
             ),
