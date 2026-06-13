@@ -99,13 +99,21 @@ def show_config_alert(page: ft.Page, on_close=None):
         if not all([text_server.value.strip(), text_user.value.strip(), txt_password.value.strip()]):
             return
         db = sql_class()
-        databases, _ = db.list_databases(
+        databases, error_msg = db.list_databases(
             server=text_server.value,
             username=text_user.value,
             password=txt_password.value,
         )
-        # dd_db.options = [_empty_option] + [ft.DropdownOption(d) for d in databases]
-        dd_db.options =[ft.DropdownOption(d) for d in databases]
+        if not databases:
+            message_text.value = error_msg
+            message_text.color = ft.Colors.RED
+            message_container.visible = True
+            message_container.update()
+            message_text.update()
+            return
+        message_container.visible = False
+        message_container.update()
+        dd_db.options = [ft.DropdownOption(d) for d in databases]
         dd_db.value = preselect if preselect and preselect in databases else " "
         dd_db.update()
 

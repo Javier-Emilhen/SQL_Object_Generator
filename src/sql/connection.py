@@ -53,7 +53,10 @@ class sql_class:
             password=password,
             host=server,
             database=database,
-            query={"driver": sql_class._get_driver()},
+            query={
+                "driver": sql_class._get_driver(),
+                "TrustServerCertificate": "yes",
+            },
         )
 
     def connect(self):
